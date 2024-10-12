@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.agileboot.api.mapper.ItemMapper">
+
+    <resultMap id="Author" type="User">
+        <id column="author_id" property="id"/>
+        <result property="name" column="username"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+    <resultMap id="itemAuthor" type="Item">
+        <id column="id" property="id"/>
+        <result property="title" column="title"/>
+        <result property="createTime" column="create_time"/>
+        <result property="picUrl" column="picUrl"/>
+        <result property="category" column="category"/>
+        <result property="viewCounts" column="view_counts"/>
+        <result property="commentCounts" column="comment_counts"/>
+        <result property="content" column="content"/>
+        <association property="author" javaType="User" resultMap="Author"/>
+    </resultMap>
+    <resultMap id="commentsAuthor" type="ItemComment">
+        <id column="id" property="id"/>
+        <result property="content" column="content"/>
+        <result property="commentTime" column="comment_time"/>
+        <association property="commentAuthor" javaType="User" resultMap="Author"/>
+    </resultMap>
+    <resultMap id="replyAuthor" type="CommentReply">
+        <id column="id" property="id"/>
+        <result property="content" column="content"/>
+        <result property="replyTime" column="reply_time"/>
+        <association property="replyAuthor" javaType="User" resultMap="Author"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="itemAuthor">
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, category, a.create_time, view_counts, comment_counts
+        FROM t_item a,sys_user u
+        WHERE a.author_id = u.user_id
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getItemById" resultMap="itemAuthor">
+        SELECT a.id, title, category, u.user_id author_id, u.username, u.avatar, content, a.create_time, view_counts, comment_counts
+        FROM t_item a,sys_user u
+        WHERE a.author_id = u.user_id AND a.id = #{id}
+    </select>
+
+    <select id="getComments" resultMap="commentsAuthor">
+        SELECT c.id, c.content, c.comment_time, u.user_id AS author_id, u.username, u.avatar
+        FROM sys_user u
+        JOIN t_comments c ON c.author_id = u.user_id
+        WHERE c.id IN (
+            SELECT comment
+            FROM t_item_comment_reply
+            WHERE item = #{id}
+        );
+    </select>
+    <select id="getItemByCategory" resultMap="itemAuthor">
+        SELECT a.id, title, category, u.user_id author_id, u.username, u.avatar, content, a.create_time, view_counts, comment_counts
+        FROM t_item a,t_user u
+        WHERE a.author_id = u.user_id AND category = #{category}
+    </select>
+    <select id="getReply" resultMap="replyAuthor">
+        SELECT cr.id, content, reply_time, u.user_id author_id, u.username, u.avatar
+        FROM t_comment_reply cr
+                 JOIN sys_user u ON cr.author_id = u.user_id
+        WHERE cr.id IN(
+            SELECT reply
+            FROM t_item_comment_reply
+            WHERE COMMENT = #{id}
+        )
+    </select>
+    <insert id="addComment" parameterType="ItemComment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_comments(content, author_id, comment_time)
+        VALUES (#{content}, #{commentAuthor.id}, CURRENT_TIMESTAMP)
+    </insert>
+    <insert id="addCommentReply" parameterType="CommentReply" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_comment_reply(content, author_id, reply_time)
+        VALUES (#{content}, #{replyAuthor.id}, CURRENT_TIMESTAMP)
+    </insert>
+    <insert id="addItem" parameterType="Item">
+        insert into t_item(title, content, author_id, category, create_time, view_counts, comment_counts)
+        values (#{title}, #{content}, #{author.id}, #{category}, CURRENT_TIMESTAMP, 0, 0)
+    </insert>
+    <select id="findByUserName" resultMap="itemAuthor">
+        SELECT a.id, title, u.user_id author_id, u.name, u.avatar, category, a.create_time, view_counts, comment_counts
+        FROM t_item a,sys_user u
+        WHERE a.author_id = u.user_id AND u.user_id = #{userId}
+    </select>
+</mapper>

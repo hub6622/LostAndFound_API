@@ -1,4 +1,4 @@
-package com.agileboot.api.pojo;
+package com.zjitc.lostandfound_api.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +15,6 @@ public class ItemComment {
     private String commentTime;
     private String content;
     private Integer commentOrder;
+    private Integer itemId;
     private List<CommentReply> commentReply;
 }

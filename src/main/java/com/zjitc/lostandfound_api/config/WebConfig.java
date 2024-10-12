@@ -1,6 +1,6 @@
-package com.agileboot.api.config;
+package com.zjitc.lostandfound_api.config;
 
-import com.agileboot.api.interceptor.LoginInterceptor;
+import com.zjitc.lostandfound_api.interceptor.LoginInterceptor;
 import javax.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

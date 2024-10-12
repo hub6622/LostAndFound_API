@@ -1,7 +1,7 @@
-package com.agileboot.api.interceptor;
+package com.zjitc.lostandfound_api.interceptor;
 
 import com.auth0.jwt.interfaces.Claim;
-import com.agileboot.api.utils.JwtToken;
+import com.zjitc.lostandfound_api.utils.JwtToken;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -1,7 +1,7 @@
-package com.agileboot.api.service;
+package com.zjitc.lostandfound_api.service;
 
-import com.agileboot.api.pojo.Item; // 修改了pojo的名字
-import com.agileboot.api.pojo.ItemComment; // 修改了pojo的名字
+import com.zjitc.lostandfound_api.pojo.Item; // 修改了pojo的名字
+import com.zjitc.lostandfound_api.pojo.ItemComment; // 修改了pojo的名字
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public interface ItemService { // 修改了service的名字
 
     void addComment(String name, String content, Integer itemId); // 修改了方法名和参数名
 
-    void addCommentReply(String name, String content, Integer commentId); // 修改了方法名
+    void addCommentReply(String name, String content, Integer commentId, Integer itemId); // 修改了方法名
 
     void addItem(String name, Map<String, Object> item); // 修改了方法名和参数名
 
@@ -34,4 +34,6 @@ public interface ItemService { // 修改了service的名字
     List<Item> findByUser(Integer userId); // 修改了返回类型
 
     void delItem(Integer itemId); // 修改了方法名和参数名
+
+    void updateItem(Map<String, Object> item);
 }

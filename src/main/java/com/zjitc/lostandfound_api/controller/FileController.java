@@ -1,8 +1,8 @@
-package com.agileboot.api.controller;
+package com.zjitc.lostandfound_api.controller;
 
-import com.agileboot.api.config.MinioConfig;
-import com.agileboot.api.pojo.Result;
-import com.agileboot.api.utils.MinioUtils;
+import com.zjitc.lostandfound_api.config.MinioConfig;
+import com.zjitc.lostandfound_api.pojo.Result;
+import com.zjitc.lostandfound_api.utils.MinioUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;

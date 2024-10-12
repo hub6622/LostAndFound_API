@@ -1,13 +1,13 @@
-package com.agileboot.api.service.impl;
+package com.zjitc.lostandfound_api.service.impl;
 
-import com.agileboot.api.mapper.ItemMapper; // 修改了mapper的名字
-import com.agileboot.api.mapper.UserMapper;
-import com.agileboot.api.pojo.Item; // 修改了pojo的名字
-import com.agileboot.api.pojo.ItemComment; // 修改了pojo的名字
-import com.agileboot.api.pojo.CommentReply;
-import com.agileboot.api.pojo.User;
-import com.agileboot.api.service.ItemService; // 修改了service的名字
-import com.agileboot.api.service.UserService;
+import com.zjitc.lostandfound_api.mapper.ItemMapper; // 修改了mapper的名字
+import com.zjitc.lostandfound_api.mapper.UserMapper;
+import com.zjitc.lostandfound_api.pojo.Item; // 修改了pojo的名字
+import com.zjitc.lostandfound_api.pojo.ItemComment; // 修改了pojo的名字
+import com.zjitc.lostandfound_api.pojo.CommentReply;
+import com.zjitc.lostandfound_api.pojo.User;
+import com.zjitc.lostandfound_api.service.ItemService; // 修改了service的名字
+import com.zjitc.lostandfound_api.service.UserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -59,6 +59,7 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
         ItemComment itemComment = new ItemComment(); // 修改了pojo的名字
         itemComment.setCommentAuthor(new User(userMapper.getUser(name).getId()));
         itemComment.setContent(content);
+        itemComment.setItemId(itemId);
 
         itemMapper.addComment(itemComment); // 返回的是受影响的行数
         Integer commentId = itemComment.getId(); // 返回的是插入后自增的id
@@ -66,10 +67,11 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
     }
 
     @Override
-    public void addCommentReply(String name, String content, Integer commentId) {
+    public void addCommentReply(String name, String content, Integer commentId, Integer itemId) {
         CommentReply commentReply = new CommentReply();
         commentReply.setReplyAuthor(new User(userMapper.getUser(name).getId()));
         commentReply.setContent(content);
+        commentReply.setItemId(itemId);
         itemMapper.addCommentReply(commentReply); // 返回的是受影响的行数
         Integer replyId = commentReply.getId(); // 返回的是插入后自增的id
         itemMapper.addItemCommentReply(null, commentId, replyId); // 修改了方法名和参数名
@@ -80,7 +82,9 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
         Item item1 = new Item(); // 修改了pojo的名字
         item1.setTitle((String) item.get("title"));
         item1.setContent((String) item.get("content"));
+        item1.setPicUrl((String) item.get("picUrl"));
         item1.setCategory((String) item.get("category"));
+        item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
         item1.setAuthor(new User(userMapper.getUser(name).getId()));
         System.out.println("item1++++" + item1);
         itemMapper.addItem(item1); // 修改了方法名
@@ -88,15 +92,7 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
 
     @Override
     public void updateItemCommentCounts(Integer id) { // 修改了方法名
-        Integer itemId = id;
-        try {
-            List<Integer> l = itemMapper.findItemIdByCommentId(itemId); // 修改了方法名
-            itemId = l.get(0);
-            System.out.println("itemId++++" + itemId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        itemMapper.updateItemCommentCounts(itemId); // 修改了方法名
+        itemMapper.updateItemCommentCounts(id); // 修改了方法名
     }
 
     @Override
@@ -124,8 +120,20 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
         itemMapper.delItem(itemId); // 修改了方法名
         List<Integer> commentIds = itemMapper.findCommentIdByItemId(itemId); // 修改了方法名
         for (Integer id : commentIds) {
-            userService.delComment(id);
+            userService.delComment(id, itemId);
         }
         itemMapper.delItemCommentReplyByItemId(itemId); // 修改了方法名
+    }
+
+    @Override
+    public void updateItem(Map<String, Object> item) {
+        Item item1 = new Item();
+        item1.setId(Integer.parseInt(item.get("id").toString()));
+        item1.setTitle((String) item.get("title"));
+        item1.setContent((String) item.get("content"));
+        item1.setPicUrl((String) item.get("picUrl"));
+        item1.setCategory((String) item.get("category"));
+        item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
+        itemMapper.updateItem(item1);
     }
 }

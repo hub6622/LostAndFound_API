@@ -1,8 +1,8 @@
-package com.agileboot.api.service;
+package com.zjitc.lostandfound_api.service;
 
 
-import com.agileboot.api.pojo.ItemComment;
-import com.agileboot.api.pojo.User;
+import com.zjitc.lostandfound_api.pojo.ItemComment;
+import com.zjitc.lostandfound_api.pojo.User;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public interface UserService {
 
     List<ItemComment> getUserComment(Integer userId);
 
-    void delComment(Integer commentId);
+    void delComment(Integer commentId, Integer itemId);
     void delReply(Integer replyId);
 
     Boolean confirmPwd(String pwd, String token);
@@ -26,4 +26,6 @@ public interface UserService {
     String updateUserInfo(Map<String, Object> userInfo);
 
     void updateAvatar(String avatarUrl,Integer userId);
+
+    void sendContact(Map<String, Object> params, String token);
 }

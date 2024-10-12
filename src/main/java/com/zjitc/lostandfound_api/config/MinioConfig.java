@@ -1,4 +1,4 @@
-package com.agileboot.api.config;
+package com.zjitc.lostandfound_api.config;
 
 import io.minio.MinioClient;
 import lombok.Data;

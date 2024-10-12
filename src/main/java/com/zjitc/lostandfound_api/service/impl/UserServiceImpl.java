@@ -1,18 +1,23 @@
-package com.agileboot.api.service.impl;
+package com.zjitc.lostandfound_api.service.impl;
 
 
 import com.auth0.jwt.interfaces.Claim;
-import com.agileboot.api.mapper.ItemMapper;
-import com.agileboot.api.mapper.UserMapper;
-import com.agileboot.api.pojo.ItemComment;
-import com.agileboot.api.pojo.CommentReply;
-import com.agileboot.api.pojo.User;
-import com.agileboot.api.service.UserService;
-import com.agileboot.api.utils.EncodeUtil;
-import com.agileboot.api.utils.JwtToken;
+import com.zjitc.lostandfound_api.mapper.ItemMapper;
+import com.zjitc.lostandfound_api.mapper.UserMapper;
+import com.zjitc.lostandfound_api.pojo.ItemComment;
+import com.zjitc.lostandfound_api.pojo.CommentReply;
+import com.zjitc.lostandfound_api.pojo.Notice;
+import com.zjitc.lostandfound_api.pojo.User;
+import com.zjitc.lostandfound_api.service.UserService;
+import com.zjitc.lostandfound_api.utils.EncodeUtil;
+import com.zjitc.lostandfound_api.utils.JwtToken;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean register(User user) {
-        user.setPassword(encodeUtil.bcryptEncode(user.getPassword()));
+        user.setPassword(encodeUtil.Md5Encode(user.getPassword()));
         userMapper.register(user);
         return false;
     }
@@ -35,7 +40,8 @@ public class UserServiceImpl implements UserService {
     public boolean login(User user) {
         String Pwd = userMapper.getPwd(user.getName());
         try {
-            return encodeUtil.checkPassword(user.getPassword(), Pwd);
+            System.out.println("Pwd"+Pwd);
+            return encodeUtil.checkPassword(Pwd, user.getPassword());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -63,18 +69,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<ItemComment> getUserComment(Integer userId) {
-        List<ItemComment> articleComment = userMapper.getComments(userId);
+        List<ItemComment> itemComment = userMapper.getComments(userId);
         List<CommentReply> commentReply = userMapper.getReply(userId);
-        ItemComment articleComment1 = articleComment.get(0);
-        articleComment1.setCommentReply(commentReply);
-        articleComment.set(0, articleComment1);
-        return articleComment;
+        ItemComment itemComment1 = itemComment.get(0);
+        itemComment1.setCommentReply(commentReply);
+        itemComment.set(0, itemComment1);
+        return itemComment;
     }
 
     @Override
-    public void delComment(Integer commentId) {
+    public void delComment(Integer commentId, Integer itemId) {
         userMapper.delCommentById(commentId);
         List<Integer> replyIds = userMapper.findReplyIdByCommentId(commentId);
+        System.out.println("size"+replyIds.size());
+        userMapper.subtractCommentCounts(replyIds.size(),itemId);
         System.out.println("replyIds" + replyIds);
         for (Integer id : replyIds) {
             userMapper.delReplyById(id);
@@ -111,12 +119,12 @@ public class UserServiceImpl implements UserService {
             return "Email";
         } else if (userInfo.get("password") != null && userInfo.get("email") == null) {
             System.out.println(22);
-            user.setPassword(encodeUtil.bcryptEncode(userInfo.get("password").toString()));
+            user.setPassword(encodeUtil.Md5Encode(userInfo.get("password").toString()));
             userMapper.updateUserPwd(user);
             return "Pwd";
         } else if (userInfo.get("password") != null && userInfo.get("email") != null && !userInfo.get("password").toString().isEmpty()) {
             System.out.println(2);
-            user.setPassword(encodeUtil.bcryptEncode(userInfo.get("password").toString()));
+            user.setPassword(encodeUtil.Md5Encode(userInfo.get("password").toString()));
             user.setEmail(userInfo.get("email").toString());
             userMapper.updateUserEmail(user);
             userMapper.updateUserPwd(user);
@@ -128,5 +136,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateAvatar(String avatarUrl,Integer userId) {
         userMapper.updateAvatar(avatarUrl,userId);
+    }
+
+    @Override
+    public void sendContact(Map<String, Object> params, String token) {
+        Notice notice = new Notice();
+        notice.setContact(params.get("contact").toString());
+        notice.setAuthorId(getUserId(token));
+        notice.setContent(params.get("content").toString());
+        // 定义输入日期时间格式
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+        // 解析输入的日期时间字符串
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(params.get("tradeTime").toString(), inputFormatter.withZone(ZoneId.of("Z")));
+        // 转换为 LocalDateTime
+        LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
+        // 定义输出日期时间格式
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // 格式化为 MySQL 支持的格式
+        notice.setTradeTime(localDateTime.format(outputFormatter));
+        notice.setItemId(Integer.parseInt(params.get("itemId").toString()));
+        userMapper.sendContact(notice);
     }
 }

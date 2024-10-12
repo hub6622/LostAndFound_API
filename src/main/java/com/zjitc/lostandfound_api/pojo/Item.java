@@ -1,4 +1,4 @@
-package com.agileboot.api.pojo;
+package com.zjitc.lostandfound_api.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +19,5 @@ public class Item {
     private Integer commentCounts;
     private String content;
     private Integer commentId;
+    private Integer lostOrFound;
 }

@@ -1,8 +1,8 @@
-package com.agileboot.api.mapper;
+package com.zjitc.lostandfound_api.mapper;
 
-import com.agileboot.api.pojo.Item; // 修改了pojo的名字
-import com.agileboot.api.pojo.ItemComment; // 修改了pojo的名字
-import com.agileboot.api.pojo.CommentReply;
+import com.zjitc.lostandfound_api.pojo.Item; // 修改了pojo的名字
+import com.zjitc.lostandfound_api.pojo.ItemComment; // 修改了pojo的名字
+import com.zjitc.lostandfound_api.pojo.CommentReply;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -32,10 +32,10 @@ public interface ItemMapper { // 修改了mapper的名字
 
     @Update("update t_item set comment_counts = comment_counts + 1 where id = #{itemId}") // 修改了表名和字段名
     void updateItemCommentCounts(Integer itemId); // 修改了方法名
-
+    @Update("update t_item set title=#{title}, content=#{content}, picUrl=#{picUrl}, category=#{category}, lostfound=#{lostOrFound} where id = #{id}")
+    void updateItem(Item item);
     @Select("select item from t_item_comment_reply where comment = #{commentId}") // 修改了表名和字段名
     List<Integer> findItemIdByCommentId(Integer commentId); // 修改了方法名和返回类型
-
     @Select("select distinct comment from t_item_comment_reply where item = #{itemId}") // 修改了表名和字段名
     List<Integer> findCommentIdByItemId(Integer itemId); // 修改了方法名和参数名
 
@@ -55,4 +55,6 @@ public interface ItemMapper { // 修改了mapper的名字
 
     @Delete("delete from t_item_comment_reply where item = #{itemId}") // 修改了表名和字段名
     void delItemCommentReplyByItemId(Integer itemId); // 修改了方法名和参数名
+
+
 }

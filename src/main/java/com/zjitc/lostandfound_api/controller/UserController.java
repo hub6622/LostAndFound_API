@@ -1,9 +1,9 @@
-package com.agileboot.api.controller;
+package com.zjitc.lostandfound_api.controller;
 
-import com.agileboot.api.pojo.Result;
-import com.agileboot.api.pojo.User;
-import com.agileboot.api.service.UserService;
-import com.agileboot.api.utils.JwtToken;
+import com.zjitc.lostandfound_api.pojo.Result;
+import com.zjitc.lostandfound_api.pojo.User;
+import com.zjitc.lostandfound_api.service.UserService;
+import com.zjitc.lostandfound_api.utils.JwtToken;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +48,17 @@ public class UserController {
     @GetMapping("/getUserComment")
     public Result getUserComment(@RequestHeader(name="Authorization") String token) {
         Integer userId=userService.getUserId(token);
-        return new Result(200,"获取成功",userService.getUserComment(userId));
+        try{
+            return new Result(200,"获取成功",userService.getUserComment(userId));
+        }catch (Exception e){
+            return new Result(200,"获取成功,无评论",null);
+        }
     }
     @PostMapping("/commentDelete")
     public Result commentDelete(@RequestBody Map<String, Object> comment) {
         Integer commentId=Integer.parseInt(comment.get("id").toString());
-        userService.delComment(commentId);
+        Integer itemId = Integer.parseInt(comment.get("itemId").toString());
+        userService.delComment(commentId, itemId);
         return new Result(200,"删除成功",null);
     }
     @PostMapping("/replyDelete")

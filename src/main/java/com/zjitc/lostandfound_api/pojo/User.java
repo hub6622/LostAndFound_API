@@ -1,4 +1,4 @@
-package com.agileboot.api.pojo;
+package com.zjitc.lostandfound_api.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ public class User {
     private String password;
     private String email;
     private String avatar;
-
+    private String phone;
     public User(Integer i) {
         this.id = i;
     }

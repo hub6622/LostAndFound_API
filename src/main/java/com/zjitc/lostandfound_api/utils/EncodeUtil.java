@@ -1,29 +1,24 @@
-package com.agileboot.api.utils;
+package com.zjitc.lostandfound_api.utils;
 
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.DigestUtils;
+
+import java.io.UnsupportedEncodingException;
 
 public class EncodeUtil {
-    BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
 
-    /**
-     * 使用 BCrypt 对密码进行加密
-     * @param pwd 明文密码
-     * @return 加密后的密码
-     */
-    public String bcryptEncode(String pwd) {
+    public String Md5Encode(String Pwd){
+        String encodePwd = "";
+        try{
+            encodePwd = DigestUtils.md5DigestAsHex(Pwd.getBytes("utf-8"));
 
-        String encodedPwd = bcryptPasswordEncoder.encode(pwd);
-        return encodedPwd;
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+        }
+        return encodePwd;
     }
-
-    /**
-     * 验证密码是否匹配
-     * @param plainPwd 明文密码
-     * @param encodedPwd 加密后的密码
-     * @return 是否匹配
-     */
-    public boolean checkPassword(String plainPwd, String encodedPwd) {
-        return bcryptPasswordEncoder.matches(plainPwd, encodedPwd);
+    public Boolean checkPassword(String encodePwd, String pwd){
+        return Md5Encode(pwd).equals(encodePwd);
     }
 }
+

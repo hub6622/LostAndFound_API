@@ -3,8 +3,37 @@
 
 
 <mapper namespace="com.zjitc.lostandfound_api.mapper.UserMapper">
+    <resultMap id="Author" type="User">
+        <id column="author_id" property="id"/>
+        <result property="name" column="username"/>
+        <result property="avatar" column="avatar"/>
+        <result property="sex" column="sex"/>
+    </resultMap>
+    <resultMap id="noticeUser" type="Notice">
+        <id column="id" property="id"/>
+        <result property="content" column="content"/>
+        <result property="tradeTime" column="tradeTime"/>
+        <result property="contact" column="contact"/>
+        <result property="itemId" column="item_id"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="confirm" column="confirm"/>
+        <association property="author" javaType="User" resultMap="Author"/>
+    </resultMap>
+
     <select id="getUser" resultType="User">
-        select user_id AS id, username AS name, nickname, avatar, email, phone_number AS phone
+        select user_id AS id, username AS name, avatar, email, phone_number AS phone, sex, biography
         from sys_user where username=#{name}
+    </select>
+
+    <select id="getNotice" resultMap="noticeUser">
+        select id,content,tradeTime,item_id,updateTime,tradeTime,contact,u.user_id AS author_id, username, avatar, sex, confirm
+        from sys_notice n, sys_user u
+        where recipient_id=#{userId} and confirm = 0 and n.author_id = u.user_id
+    </select>
+    <select id="getNoticeHistory" resultMap="noticeUser">
+        select id,content,tradeTime,item_id,updateTime,tradeTime,contact,u.user_id AS author_id, username, avatar, sex, confirm
+        from sys_notice n, sys_user u
+        where recipient_id=#{userId} and n.author_id = u.user_id
+        ORDER BY confirm
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.zjitc.lostandfound_api.service.impl;
 
+import com.zjitc.lostandfound_api.config.MinioConfig;
 import com.zjitc.lostandfound_api.mapper.ItemMapper; // 修改了mapper的名字
 import com.zjitc.lostandfound_api.mapper.UserMapper;
 import com.zjitc.lostandfound_api.pojo.Item; // 修改了pojo的名字
@@ -8,6 +9,7 @@ import com.zjitc.lostandfound_api.pojo.CommentReply;
 import com.zjitc.lostandfound_api.pojo.User;
 import com.zjitc.lostandfound_api.service.ItemService; // 修改了service的名字
 import com.zjitc.lostandfound_api.service.UserService;
+import com.zjitc.lostandfound_api.utils.MinioUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -18,7 +20,6 @@ import java.util.Map;
 public class ItemServiceImpl implements ItemService { // 修改了service impl的名字
     @Resource
     ItemMapper itemMapper; // 修改了mapper的名字
-
     @Resource
     UserMapper userMapper;
 
@@ -136,4 +137,6 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
         item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
         itemMapper.updateItem(item1);
     }
+
+
 }

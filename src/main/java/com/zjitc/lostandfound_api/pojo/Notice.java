@@ -15,4 +15,7 @@ public class Notice {
     private Integer authorId;
     private User author;
     private Integer itemId;
+    private Integer confirm;
+    private String updateTime;
+    private Integer recipientId;
 }

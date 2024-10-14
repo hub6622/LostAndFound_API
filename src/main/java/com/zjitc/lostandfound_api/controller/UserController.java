@@ -69,23 +69,47 @@ public class UserController {
     }
     @PostMapping("/confirmPwd")
     public Result confirmPwd(@RequestBody Map<String, Object> pwdInfo,@RequestHeader(name="Authorization") String token) {
-        String pwd = pwdInfo.get("pwd").toString();
-        return new Result(200,"验证成功",userService.confirmPwd(pwd, token));
+        try{
+            String pwd = pwdInfo.get("pwd").toString();
+            return new Result(200,"验证成功",userService.confirmPwd(pwd, token));
+        }catch (NullPointerException e){
+            return new Result(400,"密码不能为空",null);
+        }
+
     }
     @PostMapping("/updateUserInfo")
-    public Result updateUserInfo(@RequestBody Map<String, Object> userInfo, HttpServletResponse response,@RequestHeader(name="Authorization") String token) {
+    public Result updateUserInfo(@RequestBody Map<String, Object> userInfo, @RequestHeader(name="Authorization") String token) {
         System.out.println("22222222222"+userInfo);
-        if (userService.updateUserInfo(userInfo).equals("Pwd")){
-            ValueOperations<String, String> ops = redisTemplate.opsForValue();
-            ops.getOperations().delete(token);
-            response.setStatus(401);
-        }
+        userService.updateUserInfo(userInfo, token);
+        return new Result(200,"修改成功",null);
+    }
+    @PostMapping("/changePassword")
+    public Result changePass(@RequestBody Map<String, Object> pwdInfo, HttpServletResponse response, @RequestHeader(name="Authorization") String token) {
+        userService.updateUserPwd(pwdInfo, token);
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+        ops.getOperations().delete(token);
+        response.setStatus(401);
         return new Result(200,"修改成功",null);
     }
     @PatchMapping("/updateAvatar")
     public Result updateAvatar(@RequestParam String avatarUrl, @RequestHeader(name="Authorization") String token) {
         Integer userId= userService.getUserId(token);
+
         userService.updateAvatar(avatarUrl, userId);
         return new Result(200,"修改成功",null);
+    }
+
+    @GetMapping("/getNotice")
+    public Result getNotice(@RequestHeader(name="Authorization") String token) {
+        return new Result(200,"获取成功",userService.getNotice(token));
+    }
+    @GetMapping("/getNoticeHistory")
+    public Result getNoticeHistory(@RequestHeader(name="Authorization") String token) {
+        return new Result(200,"获取成功",userService.getNoticeHistory(token));
+    }
+    @PostMapping("/confirmNotice/{id}")
+    public Result confirmNotice(@PathVariable Integer id) {
+        userService.confirmNotice(id);
+        return new Result(200,"确认成功",null);
     }
 }

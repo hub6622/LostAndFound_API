@@ -2,6 +2,7 @@ package com.zjitc.lostandfound_api.service.impl;
 
 
 import com.auth0.jwt.interfaces.Claim;
+import com.zjitc.lostandfound_api.config.MinioConfig;
 import com.zjitc.lostandfound_api.mapper.ItemMapper;
 import com.zjitc.lostandfound_api.mapper.UserMapper;
 import com.zjitc.lostandfound_api.pojo.ItemComment;
@@ -11,6 +12,7 @@ import com.zjitc.lostandfound_api.pojo.User;
 import com.zjitc.lostandfound_api.service.UserService;
 import com.zjitc.lostandfound_api.utils.EncodeUtil;
 import com.zjitc.lostandfound_api.utils.JwtToken;
+import com.zjitc.lostandfound_api.utils.MinioUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -25,8 +27,7 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     @Resource
     UserMapper userMapper;
-    @Resource
-    ItemMapper itemMapper;
+
     EncodeUtil encodeUtil = new EncodeUtil();
 
     @Override
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserService {
     public boolean login(User user) {
         String Pwd = userMapper.getPwd(user.getName());
         try {
-            System.out.println("Pwd"+Pwd);
+            System.out.println("Pwd" + Pwd);
             return encodeUtil.checkPassword(Pwd, user.getPassword());
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,6 +66,7 @@ public class UserServiceImpl implements UserService {
         JwtToken jwtToken = new JwtToken();
         Map<String, Claim> map = jwtToken.verify(token);
         return map.get("id").asInt();
+
     }
 
     @Override
@@ -81,8 +83,8 @@ public class UserServiceImpl implements UserService {
     public void delComment(Integer commentId, Integer itemId) {
         userMapper.delCommentById(commentId);
         List<Integer> replyIds = userMapper.findReplyIdByCommentId(commentId);
-        System.out.println("size"+replyIds.size());
-        userMapper.subtractCommentCounts(replyIds.size(),itemId);
+        System.out.println("size" + replyIds.size());
+        userMapper.subtractCommentCounts(replyIds.size(), itemId);
         System.out.println("replyIds" + replyIds);
         for (Integer id : replyIds) {
             userMapper.delReplyById(id);
@@ -108,34 +110,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUserInfo(Map<String, Object> userInfo) {
-        System.out.println(userInfo);
+    public void updateUserInfo(Map<String, Object> userInfo, String token) {
         User user = new User();
-        user.setId(Integer.parseInt(userInfo.get("id").toString()));
-        if (userInfo.get("password") == null && userInfo.get("email") != null) {
-            System.out.println(222);
-            user.setEmail(userInfo.get("email").toString());
-            userMapper.updateUserEmail(user);
-            return "Email";
-        } else if (userInfo.get("password") != null && userInfo.get("email") == null) {
-            System.out.println(22);
-            user.setPassword(encodeUtil.Md5Encode(userInfo.get("password").toString()));
-            userMapper.updateUserPwd(user);
-            return "Pwd";
-        } else if (userInfo.get("password") != null && userInfo.get("email") != null && !userInfo.get("password").toString().isEmpty()) {
-            System.out.println(2);
-            user.setPassword(encodeUtil.Md5Encode(userInfo.get("password").toString()));
-            user.setEmail(userInfo.get("email").toString());
-            userMapper.updateUserEmail(user);
-            userMapper.updateUserPwd(user);
-            return "Pwd";
-        }
-        return "aac";
+        user.setId(getUserId(token));
+        user.setEmail(userInfo.get("email").toString());
+        user.setSex(Integer.valueOf(userInfo.get("sex").toString()));
+        user.setBiography(userInfo.get("biography").toString());
+        user.setPhone(userInfo.get("phone").toString());
+        userMapper.updateUserInfo(user);
     }
 
     @Override
-    public void updateAvatar(String avatarUrl,Integer userId) {
-        userMapper.updateAvatar(avatarUrl,userId);
+    public void updateAvatar(String avatarUrl, Integer userId) {
+        userMapper.updateAvatar(avatarUrl, userId);
     }
 
     @Override
@@ -144,6 +131,7 @@ public class UserServiceImpl implements UserService {
         notice.setContact(params.get("contact").toString());
         notice.setAuthorId(getUserId(token));
         notice.setContent(params.get("content").toString());
+        notice.setRecipientId(Integer.parseInt(params.get("recipientId").toString()));
         // 定义输入日期时间格式
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
         // 解析输入的日期时间字符串
@@ -156,5 +144,28 @@ public class UserServiceImpl implements UserService {
         notice.setTradeTime(localDateTime.format(outputFormatter));
         notice.setItemId(Integer.parseInt(params.get("itemId").toString()));
         userMapper.sendContact(notice);
+    }
+
+    @Override
+    public List<Notice> getNotice(String token) {
+        return userMapper.getNotice(getUserId(token));
+    }
+
+    @Override
+    public void confirmNotice(Integer id) {
+        userMapper.updateNoticeConfirm(id);
+    }
+
+    @Override
+    public List<Notice> getNoticeHistory(String token) {
+        return userMapper.getNoticeHistory(getUserId(token));
+    }
+
+    @Override
+    public void updateUserPwd(Map<String, Object> pwdInfo, String token) {
+        User user = new User();
+        user.setId(getUserId(token));
+        user.setPassword(encodeUtil.Md5Encode(pwdInfo.get("password").toString()));
+        userMapper.updateUserPwd(user);
     }
 }

@@ -36,4 +36,5 @@ public interface ItemService { // 修改了service的名字
     void delItem(Integer itemId); // 修改了方法名和参数名
 
     void updateItem(Map<String, Object> item);
+
 }

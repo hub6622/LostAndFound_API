@@ -33,8 +33,9 @@ public interface ItemService { // 修改了service的名字
 
     List<Item> findByUser(Integer userId); // 修改了返回类型
 
-    void delItem(Integer itemId); // 修改了方法名和参数名
+    void delItem(List<Integer> ids); // 修改了方法名和参数名
 
     void updateItem(Map<String, Object> item);
 
+    List<Item> findByParams(String category, String title);
 }

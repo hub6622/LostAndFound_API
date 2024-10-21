@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     public boolean register(User user) {
         user.setPassword(encodeUtil.Md5Encode(user.getPassword()));
         userMapper.register(user);
-        return false;
+        return true;
     }
 
     @Override
@@ -167,5 +167,11 @@ public class UserServiceImpl implements UserService {
         user.setId(getUserId(token));
         user.setPassword(encodeUtil.Md5Encode(pwdInfo.get("password").toString()));
         userMapper.updateUserPwd(user);
+    }
+
+    @Override
+    public Boolean resetPwd(Integer id) {
+        String pwd = encodeUtil.Md5Encode("12345678");
+        return userMapper.resetPwd(pwd, id);
     }
 }

@@ -117,13 +117,15 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
     }
 
     @Override
-    public void delItem(Integer itemId) { // 修改了方法名
-        itemMapper.delItem(itemId); // 修改了方法名
-        List<Integer> commentIds = itemMapper.findCommentIdByItemId(itemId); // 修改了方法名
-        for (Integer id : commentIds) {
-            userService.delComment(id, itemId);
+    public void delItem(List<Integer> ids) {
+        for (Integer id : ids) {
+            itemMapper.delItem(id);
+            List<Integer> commentIds = itemMapper.findCommentIdByItemId(id);
+            for (Integer cId : commentIds) {
+                userService.delComment(cId, id);
+            }
+            itemMapper.delItemCommentReplyByItemId(id);
         }
-        itemMapper.delItemCommentReplyByItemId(itemId); // 修改了方法名
     }
 
     @Override
@@ -136,6 +138,11 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
         item1.setCategory((String) item.get("category"));
         item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
         itemMapper.updateItem(item1);
+    }
+
+    @Override
+    public List<Item> findByParams(String category, String title) {
+        return itemMapper.findByParams(category, title);
     }
 
 

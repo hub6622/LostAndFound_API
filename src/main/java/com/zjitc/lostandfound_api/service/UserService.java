@@ -40,4 +40,6 @@ public interface UserService {
     List<Notice> getNoticeHistory(String token);
 
     void updateUserPwd(Map<String, Object> pwdInfo, String token);
+
+    Boolean resetPwd(Integer id);
 }

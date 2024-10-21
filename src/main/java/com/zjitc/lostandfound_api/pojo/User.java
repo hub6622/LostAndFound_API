@@ -16,6 +16,10 @@ public class User {
     private String phone;
     private Integer sex;
     private String biography;
+    private Integer status;
+    private Integer isAdmin;
+    private String createTime;
+    private String loginTime;
     public User(Integer i) {
         this.id = i;
     }

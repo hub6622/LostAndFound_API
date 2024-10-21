@@ -1,5 +1,6 @@
 package com.zjitc.lostandfound_api.controller;
 
+import com.zjitc.lostandfound_api.pojo.Item;
 import com.zjitc.lostandfound_api.pojo.Notice;
 import com.zjitc.lostandfound_api.pojo.Result;
 import com.zjitc.lostandfound_api.service.ItemService;
@@ -7,6 +8,7 @@ import com.zjitc.lostandfound_api.service.UserService;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -111,10 +113,9 @@ public class ItemController {
     }
 
     @PostMapping("/deleteItem")
-    public Result deleteItem(@RequestBody Map<String, Object> item){
-        Integer itemId = Integer.parseInt(item.get("itemId").toString());
-        System.out.println("deleteItem" + itemId);
-        itemService.delItem(itemId);
+    public Result deleteItem(@RequestBody List<Integer> ids){
+        System.out.println("deleteItem"+ids);
+        itemService.delItem(ids);
         return new Result(200, "success", null);
     }
     @PostMapping("/sendContact")
@@ -123,5 +124,14 @@ public class ItemController {
         userService.sendContact(params, token);
 
         return new Result(200, "success", null);
+    }
+
+    @GetMapping("/getItemByParams")
+    public Result getItemByParams(@RequestParam(required = false) String category,
+                                  @RequestParam(required = false) String title){
+        System.out.println("getItemByParams"+category+"===="+title);
+        List<Item> items = itemService.findByParams(category, title);
+        System.out.println(items);
+        return new Result(200, "success", items);
     }
 }

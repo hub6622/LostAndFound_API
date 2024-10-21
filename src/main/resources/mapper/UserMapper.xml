@@ -5,10 +5,18 @@
 <mapper namespace="com.zjitc.lostandfound_api.mapper.UserMapper">
     <resultMap id="Author" type="User">
         <id column="author_id" property="id"/>
-        <result property="name" column="username"/>
-        <result property="avatar" column="avatar"/>
-        <result property="sex" column="sex"/>
+        <result property="name" column="author_username"/>
+        <result property="avatar" column="author_avatar"/>
+        <result property="sex" column="author_sex"/>
     </resultMap>
+
+    <resultMap id="Recipient" type="User">
+        <id column="recipient_id" property="id"/>
+        <result property="name" column="recipient_username"/>
+        <result property="avatar" column="recipient_avatar"/>
+        <result property="sex" column="recipient_sex"/>
+    </resultMap>
+
     <resultMap id="noticeUser" type="Notice">
         <id column="id" property="id"/>
         <result property="content" column="content"/>
@@ -18,22 +26,101 @@
         <result property="updateTime" column="updateTime"/>
         <result property="confirm" column="confirm"/>
         <association property="author" javaType="User" resultMap="Author"/>
+        <association property="recipient" javaType="User" resultMap="Recipient"/>
     </resultMap>
 
+
     <select id="getUser" resultType="User">
-        select user_id AS id, username AS name, avatar, email, phone_number AS phone, sex, biography
-        from sys_user where username=#{name}
+        select user_id      AS id,
+               username     AS name,
+               avatar,
+               email,
+               phone_number AS phone,
+               sex,
+               biography
+        from sys_user
+        where username = #{name}
     </select>
 
+
     <select id="getNotice" resultMap="noticeUser">
-        select id,content,tradeTime,item_id,updateTime,tradeTime,contact,u.user_id AS author_id, username, avatar, sex, confirm
-        from sys_notice n, sys_user u
-        where recipient_id=#{userId} and confirm = 0 and n.author_id = u.user_id
+        select n.id,
+               n.content,
+               n.item_id,
+               n.updateTime,
+               n.tradeTime,
+               n.contact,
+               n.author_id,
+               u.user_id  as author_id,
+               u.username as author_username,
+               u.avatar   as author_avatar,
+               u.sex      as author_sex,
+               n.confirm,
+               n.recipient_id,
+               r.user_id  as recipient_id,
+               r.username as recipient_username,
+               r.avatar   as recipient_avatar,
+               r.sex      as recipient_sex
+        from sys_notice n
+                 inner join
+             sys_user u on n.author_id = u.user_id
+                 inner join
+             sys_user r on n.recipient_id = r.user_id
+        where n.recipient_id = #{userId}
+          and n.confirm = 0
     </select>
+
+
     <select id="getNoticeHistory" resultMap="noticeUser">
-        select id,content,tradeTime,item_id,updateTime,tradeTime,contact,u.user_id AS author_id, username, avatar, sex, confirm
-        from sys_notice n, sys_user u
-        where recipient_id=#{userId} and n.author_id = u.user_id
-        ORDER BY confirm
+        select n.id,
+               n.content,
+               n.item_id,
+               n.updateTime,
+               n.tradeTime,
+               n.contact,
+               n.author_id,
+               u.user_id  as author_id,
+               u.username as author_username,
+               u.avatar   as author_avatar,
+               u.sex      as author_sex,
+               n.confirm,
+               n.recipient_id,
+               r.user_id  as recipient_id,
+               r.username as recipient_username,
+               r.avatar   as recipient_avatar,
+               r.sex      as recipient_sex
+        from sys_notice n
+                 inner join
+             sys_user u on n.author_id = u.user_id
+                 inner join
+             sys_user r on n.recipient_id = r.user_id
+        where n.recipient_id = #{userId}
+        ORDER BY n.confirm
     </select>
+
+    <select id="getAllNotice" resultMap="noticeUser">
+        select n.id,
+               n.content,
+               n.item_id,
+               n.updateTime,
+               n.tradeTime,
+               n.contact,
+               n.author_id,
+               u.user_id  as author_id,
+               u.username as author_username,
+               u.avatar   as author_avatar,
+               u.sex      as author_sex,
+               n.confirm,
+               n.recipient_id,
+               r.user_id  as recipient_id,
+               r.username as recipient_username,
+               r.avatar   as recipient_avatar,
+               r.sex      as recipient_sex
+        from sys_notice n
+                 inner join
+             sys_user u on n.author_id = u.user_id
+                 inner join
+             sys_user r on n.recipient_id = r.user_id
+    </select>
+
 </mapper>

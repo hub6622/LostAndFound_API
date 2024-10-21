@@ -35,7 +35,7 @@ public interface ItemMapper { // 修改了mapper的名字
     @Update("update t_item set title=#{title}, content=#{content}, picUrl=#{picUrl}, category=#{category}, lostfound=#{lostOrFound} where id = #{id}")
     void updateItem(Item item);
     @Select("select item from t_item_comment_reply where comment = #{commentId}") // 修改了表名和字段名
-    List<Integer> findItemIdByCommentId(Integer commentId); // 修改了方法名和返回类型
+    Integer findItemIdByCommentId(Integer commentId); // 修改了方法名和返回类型
     @Select("select distinct comment from t_item_comment_reply where item = #{itemId}") // 修改了表名和字段名
     List<Integer> findCommentIdByItemId(Integer itemId); // 修改了方法名和参数名
 
@@ -56,5 +56,9 @@ public interface ItemMapper { // 修改了mapper的名字
     @Delete("delete from t_item_comment_reply where item = #{itemId}") // 修改了表名和字段名
     void delItemCommentReplyByItemId(Integer itemId); // 修改了方法名和参数名
 
+    List<Item> findByParams(String category, String title);
 
+    List<CommentReply> getAllReply();
+
+    List<ItemComment> getAllComments();
 }

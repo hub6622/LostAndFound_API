@@ -91,4 +91,23 @@
         FROM t_item a,sys_user u
         WHERE a.author_id = u.user_id AND u.user_id = #{userId}
     </select>
+    <select id="findByParams" resultMap="itemAuthor">
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, category, lostfound, content, a.create_time, view_counts, comment_counts
+        FROM t_item a,sys_user u
+        WHERE a.author_id = u.user_id AND category = #{category} or title like concat('%',#{title},'%')
+    </select>
+    <select id="getAllReply" resultMap="replyAuthor">
+        SELECT cr.id, content, reply_time, u.user_id author_id, u.username, u.avatar, item_id
+        FROM t_comment_reply cr
+                 JOIN sys_user u ON cr.author_id = u.user_id
+    </select>
+    <select id="getAllComments" resultMap="commentsAuthor">
+        SELECT c.id, c.content, c.comment_time, u.user_id AS author_id, u.username, u.avatar, item_id
+        FROM sys_user u
+                 JOIN t_comments c ON c.author_id = u.user_id
+        WHERE c.id IN (
+            SELECT comment
+            FROM t_item_comment_reply
+        );
+    </select>
 </mapper>

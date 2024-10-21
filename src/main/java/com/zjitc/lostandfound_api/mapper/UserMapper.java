@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Insert("insert into sys_user(username,password,nickname) values (#{name},#{password},#{name})")
+    @Insert("insert into sys_user(username,password) values (#{name},#{password})")
     boolean register(User user);
 
     User getUser(String name);
@@ -63,4 +63,9 @@ public interface UserMapper {
 
     @Update("update sys_user set sex=#{sex},email=#{email},biography=#{biography},phone_number=#{phone} where user_id=#{id}")
     void updateUserInfo(User user);
+
+    @Update("update sys_user set password=#{pwd} where user_id=#{id}")
+    Boolean resetPwd(String pwd, Integer id);
+
+    List<Notice> getAllNotice();
 }

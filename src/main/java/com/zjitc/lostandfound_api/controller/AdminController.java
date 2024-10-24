@@ -44,7 +44,7 @@ public class AdminController {
             System.out.println(2);
             return new Result(400,"不是管理员无权登录",null);
         }else{
-            System.out.println(3);
+            System.out.println(isAdmin);
             return new Result(400,"账号或密码错误",null);
         }
     }
@@ -133,5 +133,9 @@ public class AdminController {
     public Result deleteNotice(@RequestBody List<Integer> ids){
         System.out.println("deleteNotice: " + ids);
         return new Result(200,"删除成功", adminService.deleteNotice(ids));
+    }
+    @GetMapping("/getCategory")
+    public Result getCategory(){
+        return new Result(200,"获取成功", adminService.findCategory());
     }
 }

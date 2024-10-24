@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
 <mapper namespace="com.zjitc.lostandfound_api.mapper.ItemMapper">
 
     <resultMap id="Author" type="User">
@@ -9,18 +8,19 @@
         <result property="name" column="username"/>
         <result property="avatar" column="avatar"/>
     </resultMap>
+
     <resultMap id="itemAuthor" type="Item">
         <id column="id" property="id"/>
         <result property="title" column="title"/>
         <result property="createTime" column="create_time"/>
         <result property="picUrl" column="picUrl"/>
-        <result property="category" column="category"/>
         <result property="viewCounts" column="view_counts"/>
         <result property="commentCounts" column="comment_counts"/>
         <result property="content" column="content"/>
         <result property="lostOrFound" column="lostfound"/>
         <association property="author" javaType="User" resultMap="Author"/>
     </resultMap>
+
     <resultMap id="commentsAuthor" type="ItemComment">
         <id column="id" property="id"/>
         <result property="content" column="content"/>
@@ -28,6 +28,7 @@
         <result property="itemId" column="item_id"/>
         <association property="commentAuthor" javaType="User" resultMap="Author"/>
     </resultMap>
+
     <resultMap id="replyAuthor" type="CommentReply">
         <id column="id" property="id"/>
         <result property="content" column="content"/>
@@ -37,33 +38,40 @@
     </resultMap>
 
     <select id="findAll" resultMap="itemAuthor">
-        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, category, lostfound, content, a.create_time, view_counts, comment_counts
-        FROM t_item a,sys_user u
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, content, a.create_time, view_counts, comment_counts, lostfound
+        FROM t_item a, sys_user u
         WHERE a.author_id = u.user_id
         ORDER BY create_time DESC
     </select>
 
     <select id="getItemById" resultMap="itemAuthor">
-        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, category, content, a.create_time, view_counts, comment_counts, lostfound
-        FROM t_item a,sys_user u
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, content, a.create_time, view_counts, comment_counts, lostfound
+        FROM t_item a, sys_user u
         WHERE a.author_id = u.user_id AND a.id = #{id}
     </select>
 
     <select id="getComments" resultMap="commentsAuthor">
         SELECT c.id, c.content, c.comment_time, u.user_id AS author_id, u.username, u.avatar, item_id
         FROM sys_user u
-        JOIN t_comments c ON c.author_id = u.user_id
+                 JOIN t_comments c ON c.author_id = u.user_id
         WHERE c.id IN (
             SELECT comment
             FROM t_item_comment_reply
             WHERE item = #{id}
         );
     </select>
+
     <select id="getItemByCategory" resultMap="itemAuthor">
-        SELECT a.id, title, category, u.user_id author_id, u.username, u.avatar, content, a.create_time, view_counts, comment_counts
-        FROM t_item a,t_user u
-        WHERE a.author_id = u.user_id AND category = #{category}
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, content, a.create_time, view_counts, comment_counts, lostfound
+        FROM t_item a, sys_user u
+        WHERE a.author_id = u.user_id AND a.id IN (
+            SELECT ic.item_id
+            FROM t_item_category ic
+                     JOIN t_category c ON ic.category_id = c.id
+            WHERE c.category_name = #{category}
+        )
     </select>
+
     <select id="getReply" resultMap="replyAuthor">
         SELECT cr.id, content, reply_time, u.user_id author_id, u.username, u.avatar, item_id
         FROM t_comment_reply cr
@@ -74,33 +82,53 @@
             WHERE COMMENT = #{id}
         )
     </select>
+
     <insert id="addComment" parameterType="ItemComment" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_comments(content, author_id, comment_time, item_id)
         VALUES (#{content}, #{commentAuthor.id}, CURRENT_TIMESTAMP,#{itemId})
     </insert>
+
     <insert id="addCommentReply" parameterType="CommentReply" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_comment_reply(content, author_id, reply_time, item_id)
         VALUES (#{content}, #{replyAuthor.id}, CURRENT_TIMESTAMP, #{itemId})
     </insert>
+
     <insert id="addItem" parameterType="Item">
-        insert into t_item(title, content, picUrl, author_id, category, create_time, view_counts, comment_counts, lostfound)
-        values (#{title}, #{content}, #{picUrl}, #{author.id}, #{category}, CURRENT_TIMESTAMP, 0, 0, #{lostOrFound})
+        insert into t_item(title, content, picUrl, author_id, create_time, view_counts, comment_counts, lostfound)
+        values (#{title}, #{content}, #{picUrl}, #{author.id}, CURRENT_TIMESTAMP, 0, 0, #{lostOrFound})
     </insert>
+
+    <insert id="addCategories" parameterType="map">
+        INSERT INTO t_item_category(item_id, category_id)
+        VALUES
+        <foreach collection="categoryIds" item="categoryId" separator=",">
+            (#{id}, #{categoryId})
+        </foreach>
+    </insert>
+
     <select id="findByUserName" resultMap="itemAuthor">
-        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, category, a.create_time, view_counts, comment_counts
-        FROM t_item a,sys_user u
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, content, a.create_time, view_counts, comment_counts
+        FROM t_item a, sys_user u
         WHERE a.author_id = u.user_id AND u.user_id = #{userId}
     </select>
+
     <select id="findByParams" resultMap="itemAuthor">
-        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, category, lostfound, content, a.create_time, view_counts, comment_counts
-        FROM t_item a,sys_user u
-        WHERE a.author_id = u.user_id AND category = #{category} or title like concat('%',#{title},'%')
+        SELECT a.id, title, u.user_id author_id, u.username, u.avatar, picUrl, content, a.create_time, view_counts, comment_counts, lostfound
+        FROM t_item a, sys_user u
+        WHERE a.author_id = u.user_id AND (a.id IN (
+            SELECT ic.item_id
+            FROM t_item_category ic
+                     JOIN t_category c ON ic.category_id = c.id
+            WHERE c.category_name = #{category}
+        ) OR title like concat('%',#{title},'%'))
     </select>
+
     <select id="getAllReply" resultMap="replyAuthor">
         SELECT cr.id, content, reply_time, u.user_id author_id, u.username, u.avatar, item_id
         FROM t_comment_reply cr
                  JOIN sys_user u ON cr.author_id = u.user_id
     </select>
+
     <select id="getAllComments" resultMap="commentsAuthor">
         SELECT c.id, c.content, c.comment_time, u.user_id AS author_id, u.username, u.avatar, item_id
         FROM sys_user u
@@ -110,4 +138,12 @@
             FROM t_item_comment_reply
         );
     </select>
+
+    <select id="getCategoriesByItemId" resultType="String">
+        SELECT c.category_name
+        FROM t_item_category ic
+                 JOIN t_category c ON ic.category_id = c.id
+        WHERE ic.item_id = #{id}
+    </select>
 </mapper>
+

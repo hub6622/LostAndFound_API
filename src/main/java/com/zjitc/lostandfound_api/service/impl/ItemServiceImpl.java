@@ -1,70 +1,83 @@
 package com.zjitc.lostandfound_api.service.impl;
 
-import com.zjitc.lostandfound_api.config.MinioConfig;
-import com.zjitc.lostandfound_api.mapper.ItemMapper; // 修改了mapper的名字
+import com.zjitc.lostandfound_api.mapper.FileMapper;
+import com.zjitc.lostandfound_api.mapper.ItemMapper;
 import com.zjitc.lostandfound_api.mapper.UserMapper;
-import com.zjitc.lostandfound_api.pojo.Item; // 修改了pojo的名字
-import com.zjitc.lostandfound_api.pojo.ItemComment; // 修改了pojo的名字
-import com.zjitc.lostandfound_api.pojo.CommentReply;
-import com.zjitc.lostandfound_api.pojo.User;
-import com.zjitc.lostandfound_api.service.ItemService; // 修改了service的名字
+import com.zjitc.lostandfound_api.pojo.*;
+import com.zjitc.lostandfound_api.service.ItemService;
 import com.zjitc.lostandfound_api.service.UserService;
-import com.zjitc.lostandfound_api.utils.MinioUtils;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class ItemServiceImpl implements ItemService { // 修改了service impl的名字
+public class ItemServiceImpl implements ItemService {
     @Resource
-    ItemMapper itemMapper; // 修改了mapper的名字
+    ItemMapper itemMapper;
     @Resource
     UserMapper userMapper;
+    @Resource
+    FileMapper fileMapper;
 
     @Resource
     UserService userService;
 
     @Override
     public List<Item> findAll() {
-        return itemMapper.findAll();
+        List<Item> itemList = itemMapper.findAll();
+        for (Item item:itemList
+             ) {
+            item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
+        }
+        return itemList;
     }
 
     @Override
     public List<Item> findNewest() {
-        return itemMapper.findNewest();
+        List<Item> itemList = itemMapper.findNewest();
+        for (Item item:itemList
+        ) {
+            item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
+        }
+        return itemList;
     }
 
     @Override
     public List<Item> findByCategory(String category) {
-        return itemMapper.getItemByCategory(category); // 修改了方法名
+        List<Item> itemList = itemMapper.getItemByCategory(category);
+        for (Item item:itemList
+        ) {
+            item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
+        }
+        return itemList;
     }
 
     @Override
     public Item getById(Integer id) {
-        return itemMapper.getItemById(id); // 修改了方法名和返回类型
+        return itemMapper.getItemById(id);
     }
 
+
     @Override
-    public List<ItemComment> getCommentsByItemId(Integer id) { // 修改了方法名
-        List<ItemComment> itemComment = itemMapper.getComments(id); // 修改了返回类型
+    public List<ItemComment> getCommentsByItemId(Integer id) {
+        List<ItemComment> itemComment = itemMapper.getComments(id);
         for (ItemComment ic : itemComment) {
-            ic.setCommentReply(itemMapper.getReply(ic.getId())); // 修改了方法名
+            ic.setCommentReply(itemMapper.getReply(ic.getId()));
         }
         return itemComment;
     }
 
     @Override
-    public void addComment(String name, String content, Integer itemId) { // 修改了方法名和参数名
-        ItemComment itemComment = new ItemComment(); // 修改了pojo的名字
+    public void addComment(String name, String content, Integer itemId) {
+        ItemComment itemComment = new ItemComment();
         itemComment.setCommentAuthor(new User(userMapper.getUser(name).getId()));
         itemComment.setContent(content);
         itemComment.setItemId(itemId);
 
-        itemMapper.addComment(itemComment); // 返回的是受影响的行数
-        Integer commentId = itemComment.getId(); // 返回的是插入后自增的id
-        itemMapper.addItemCommentReply(itemId, commentId, null); // 修改了方法名和参数名
+        itemMapper.addComment(itemComment);
+        Integer commentId = itemComment.getId();
+        itemMapper.addItemCommentReply(itemId, commentId, null);
     }
 
     @Override
@@ -73,22 +86,25 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
         commentReply.setReplyAuthor(new User(userMapper.getUser(name).getId()));
         commentReply.setContent(content);
         commentReply.setItemId(itemId);
-        itemMapper.addCommentReply(commentReply); // 返回的是受影响的行数
-        Integer replyId = commentReply.getId(); // 返回的是插入后自增的id
-        itemMapper.addItemCommentReply(null, commentId, replyId); // 修改了方法名和参数名
+        itemMapper.addCommentReply(commentReply);
+        Integer replyId = commentReply.getId();
+        itemMapper.addItemCommentReply(null, commentId, replyId);
     }
 
     @Override
-    public void addItem(String name, Map<String, Object> item) { // 修改了方法名
-        Item item1 = new Item(); // 修改了pojo的名字
+    public void addItem(String name, Map<String, Object> item) {
+        Item item1 = new Item();
+        String url= (String) item.get("picUrl");
         item1.setTitle((String) item.get("title"));
         item1.setContent((String) item.get("content"));
-        item1.setPicUrl((String) item.get("picUrl"));
-        item1.setCategory((String) item.get("category"));
+        item1.setPicUrl(url);
+//        item1.setCategory((String) item.get("category"));
         item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
-        item1.setAuthor(new User(userMapper.getUser(name).getId()));
-        System.out.println("item1++++" + item1);
-        itemMapper.addItem(item1); // 修改了方法名
+        User user = userMapper.getUser(name);
+        item1.setAuthor(user);
+        String filename = url.substring(url.lastIndexOf('/') + 1);
+        itemMapper.addItem(item1);
+        fileMapper.addUserFile( filename, item1.getPicUrl(), user.getId());
     }
 
     @Override
@@ -131,18 +147,58 @@ public class ItemServiceImpl implements ItemService { // 修改了service impl�
     @Override
     public void updateItem(Map<String, Object> item) {
         Item item1 = new Item();
+        String url= (String) item.get("picUrl");
         item1.setId(Integer.parseInt(item.get("id").toString()));
         item1.setTitle((String) item.get("title"));
         item1.setContent((String) item.get("content"));
         item1.setPicUrl((String) item.get("picUrl"));
-        item1.setCategory((String) item.get("category"));
+        List<Integer> categoriesId = (List<Integer>) item.get("categories");
+
         item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
+        String filename = url.substring(url.lastIndexOf('/') + 1);
+        fileMapper.updateItemFile(item1.getId(), filename, item1.getPicUrl());
         itemMapper.updateItem(item1);
+        for (Integer categoryId:categoriesId
+             ) {
+            itemMapper.updateItemCategory(categoryId,item1.getId());
+        }
+
     }
 
     @Override
     public List<Item> findByParams(String category, String title) {
-        return itemMapper.findByParams(category, title);
+        List<Item> itemList = itemMapper.findByParams(category, title);
+        for (Item item:itemList
+        ) {
+            item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
+        }
+        return itemList;
+    }
+
+    @Override
+    public boolean addCategory(Map<String, Object> params) {
+        String categoryName = (String) params.get("categoryName");
+        System.out.println("categoryName"+categoryName);
+        return itemMapper.addCategory(categoryName);
+    }
+
+    @Override
+    public Boolean updateCategory(Map<String, Object> params) {
+        String categoryName = (String) params.get("categoryName");
+        System.out.println("categoryName"+categoryName);
+        Integer id = Integer.parseInt(params.get("id").toString());
+        System.out.println("updateCategory"+id+"===="+categoryName);
+        return itemMapper.updateCategory(categoryName, id);
+    }
+
+    @Override
+    public boolean deleteCategory(List<Integer> ids) {
+        System.out.println("deleteCategory"+ids);
+        for (Integer id:ids
+             ) {
+            itemMapper.delCategory(id);
+        }
+        return true;
     }
 
 

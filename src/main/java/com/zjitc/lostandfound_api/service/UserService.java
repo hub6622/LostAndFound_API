@@ -11,7 +11,7 @@ import java.util.Map;
 public interface UserService {
     boolean register(User user);
 
-    boolean login(User user);
+    Integer login(User user);
 
     User getInfo(String name);
 
@@ -42,4 +42,6 @@ public interface UserService {
     void updateUserPwd(Map<String, Object> pwdInfo, String token);
 
     Boolean resetPwd(Integer id);
+
+    void setLoginTime(String name);
 }

@@ -3,10 +3,7 @@ package com.zjitc.lostandfound_api.service.impl;
 import com.zjitc.lostandfound_api.mapper.AdminMapper;
 import com.zjitc.lostandfound_api.mapper.ItemMapper;
 import com.zjitc.lostandfound_api.mapper.UserMapper;
-import com.zjitc.lostandfound_api.pojo.CommentReply;
-import com.zjitc.lostandfound_api.pojo.ItemComment;
-import com.zjitc.lostandfound_api.pojo.Notice;
-import com.zjitc.lostandfound_api.pojo.User;
+import com.zjitc.lostandfound_api.pojo.*;
 import com.zjitc.lostandfound_api.service.AdminService;
 import com.zjitc.lostandfound_api.service.UserService;
 import com.zjitc.lostandfound_api.utils.EncodeUtil;
@@ -126,7 +123,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Integer login(User user) {
-        if (userService.login(user)){
+        EncodeUtil encodeUtil = new EncodeUtil();
+        if (encodeUtil.checkPassword(userMapper.getPwd(user.getName()), user.getPassword())){
             if(adminMapper.isAdmin(user.getName())){
                 return 1;
             }else{
@@ -149,6 +147,11 @@ public class AdminServiceImpl implements AdminService {
             adminMapper.deleteNotice(id);
         }
         return true;
+    }
+
+    @Override
+    public List<Category> findCategory() {
+        return adminMapper.findAllCategory();
     }
 
 

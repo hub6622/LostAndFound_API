@@ -31,12 +31,15 @@ public class UserController {
     public Result login(@RequestBody User user) {
         System.out.println(user);
         JwtToken jwtToken=new JwtToken();
-        if (userService.login(user)){
+        if ( userService.login(user)==1 ){
+            userService.setLoginTime(user.getName());
             String token = jwtToken.encode(userService.getInfo(user.getName()));
             ValueOperations<String, String> ops = redisTemplate.opsForValue();
             ops.set(token,token,4, TimeUnit.HOURS);
             return new Result(200,"登录成功",token);
-        }else {
+        }else if( userService.login(user)==2){
+            return new Result(400,"该账号被禁用",null);
+        }else{
             return new Result(400,"账号或密码错误",null);
         }
     }
@@ -94,7 +97,6 @@ public class UserController {
     @PatchMapping("/updateAvatar")
     public Result updateAvatar(@RequestParam String avatarUrl, @RequestHeader(name="Authorization") String token) {
         Integer userId= userService.getUserId(token);
-
         userService.updateAvatar(avatarUrl, userId);
         return new Result(200,"修改成功",null);
     }

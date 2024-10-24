@@ -3,6 +3,7 @@ package com.zjitc.lostandfound_api.service.impl;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.zjitc.lostandfound_api.config.MinioConfig;
+import com.zjitc.lostandfound_api.mapper.FileMapper;
 import com.zjitc.lostandfound_api.mapper.ItemMapper;
 import com.zjitc.lostandfound_api.mapper.UserMapper;
 import com.zjitc.lostandfound_api.pojo.ItemComment;
@@ -22,30 +23,47 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Resource
     UserMapper userMapper;
-
+    @Resource
+    FileMapper fileMapper;
     EncodeUtil encodeUtil = new EncodeUtil();
 
     @Override
     public boolean register(User user) {
         user.setPassword(encodeUtil.Md5Encode(user.getPassword()));
-        userMapper.register(user);
+        if(user.getAvatar()==null) user.setAvatar("http://www.ppg6.store:9000/public/d5f11b41-4b24-49ae-9268-283a580b7767.png");
+        String filename = user.getAvatar().substring(user.getAvatar().lastIndexOf('/') + 1);
+        System.out.println(filename);
+        Integer id = userMapper.register(user);
+        if(user.getAvatar()==null){
+            return true;
+        }else{
+            fileMapper.addUserFile(filename, user.getAvatar(), id);
+        }
         return true;
     }
 
     @Override
-    public boolean login(User user) {
+    public Integer login(User user) {
         String Pwd = userMapper.getPwd(user.getName());
         try {
-            System.out.println("Pwd" + Pwd);
-            return encodeUtil.checkPassword(Pwd, user.getPassword());
+            if (encodeUtil.checkPassword(Pwd, user.getPassword())){
+                if(userMapper.status(user.getName()) == 1){
+                    return 1;
+                }else {
+                    return 2;
+                }
+            }else {
+                return 3;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 4;
         }
     }
 
@@ -122,6 +140,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateAvatar(String avatarUrl, Integer userId) {
+        String filename = avatarUrl.substring(avatarUrl.lastIndexOf('/') + 1);
+        System.out.println(filename);
+        fileMapper.updateUserFile(filename, avatarUrl, userId);
         userMapper.updateAvatar(avatarUrl, userId);
     }
 
@@ -173,5 +194,10 @@ public class UserServiceImpl implements UserService {
     public Boolean resetPwd(Integer id) {
         String pwd = encodeUtil.Md5Encode("12345678");
         return userMapper.resetPwd(pwd, id);
+    }
+
+    @Override
+    public void setLoginTime(String name) {
+        userMapper.setLoginTime(name);
     }
 }

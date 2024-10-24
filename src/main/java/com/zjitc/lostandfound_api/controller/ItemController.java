@@ -35,10 +35,10 @@ public class ItemController {
         return new Result(200, "success", itemService.getById(id));
     }
 
-    @GetMapping("/getItemByCategory/{category}")
-    public Result getItemByCategory(@PathVariable String category){
-        System.out.println("getItemByCategory" + itemService.findByCategory(category));
-        return new Result(200, "success", itemService.findByCategory(category));
+    @GetMapping("/getItemByCategory/{cate}")
+    public Result getItemByCategory(@PathVariable String cate){
+        System.out.println("getItemByCategory===" + cate);
+        return new Result(200, "success", itemService.findByCategory(cate));
     }
 
     @GetMapping("/getCategory")
@@ -133,5 +133,17 @@ public class ItemController {
         List<Item> items = itemService.findByParams(category, title);
         System.out.println(items);
         return new Result(200, "success", items);
+    }
+    @PostMapping("/addCategory")
+    public Result addCategory(@RequestBody Map<String, Object> params){
+        return new Result(200, "success", itemService.addCategory(params));
+    }
+    @PostMapping("/updateCategory")
+    public Result updateCategory(@RequestBody Map<String, Object> params){
+        return new Result(200, "success", itemService.updateCategory(params));
+    }
+    @PostMapping("/deleteCategory")
+    public Result deleteCategory(@RequestBody List<Integer> ids){
+        return new Result(200, "success", itemService.deleteCategory(ids));
     }
 }

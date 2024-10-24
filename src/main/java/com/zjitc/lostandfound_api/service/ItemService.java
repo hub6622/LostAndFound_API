@@ -38,4 +38,10 @@ public interface ItemService { // 修改了service的名字
     void updateItem(Map<String, Object> item);
 
     List<Item> findByParams(String category, String title);
+
+    boolean addCategory(Map<String, Object> params);
+
+    Boolean updateCategory(Map<String, Object> params);
+
+    boolean deleteCategory(List<Integer> ids);
 }

@@ -1,5 +1,6 @@
 package com.zjitc.lostandfound_api.service;
 
+import com.zjitc.lostandfound_api.pojo.Category;
 import com.zjitc.lostandfound_api.pojo.ItemComment;
 import com.zjitc.lostandfound_api.pojo.Notice;
 import com.zjitc.lostandfound_api.pojo.User;
@@ -35,4 +36,6 @@ public interface AdminService {
     List<Notice> getAllNotice();
 
     boolean deleteNotice(List<Integer> ids);
+
+    List<Category> findCategory();
 }

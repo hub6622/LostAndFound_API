@@ -1,5 +1,6 @@
 package com.zjitc.lostandfound_api.mapper;
 
+import com.zjitc.lostandfound_api.pojo.Category;
 import com.zjitc.lostandfound_api.pojo.CommentReply;
 import com.zjitc.lostandfound_api.pojo.ItemComment;
 import com.zjitc.lostandfound_api.pojo.User;
@@ -59,4 +60,7 @@ public interface AdminMapper {
 
     @Delete("delete from sys_notice where id=#{id}")
     void deleteNotice(Integer id);
+
+    @Select("select * from t_category")
+    List<Category> findAllCategory();
 }

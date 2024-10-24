@@ -11,8 +11,9 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Insert("insert into sys_user(username,password) values (#{name},#{password})")
-    boolean register(User user);
+    @Insert("insert into sys_user(create_time,username,password,avatar,sex) values (CURRENT_TIMESTAMP,#{name},#{password},#{avatar},#{sex})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    Integer register(User user);
 
     User getUser(String name);
 
@@ -68,4 +69,10 @@ public interface UserMapper {
     Boolean resetPwd(String pwd, Integer id);
 
     List<Notice> getAllNotice();
+
+    @Select("select status from sys_user where username=#{name}")
+    Integer status(String name);
+
+    @Update("update sys_user set login_date=CURRENT_TIMESTAMP where username=#{name}")
+    void setLoginTime(String name);
 }

@@ -93,7 +93,7 @@
         VALUES (#{content}, #{replyAuthor.id}, CURRENT_TIMESTAMP, #{itemId})
     </insert>
 
-    <insert id="addItem" parameterType="Item">
+    <insert id="addItem" parameterType="Item" useGeneratedKeys="true" keyProperty="id">
         insert into t_item(title, content, picUrl, author_id, create_time, view_counts, comment_counts, lostfound)
         values (#{title}, #{content}, #{picUrl}, #{author.id}, CURRENT_TIMESTAMP, 0, 0, #{lostOrFound})
     </insert>
@@ -145,5 +145,11 @@
                  JOIN t_category c ON ic.category_id = c.id
         WHERE ic.item_id = #{id}
     </select>
+    <insert id="updateItemCategory" parameterType="map">
+        <selectKey keyProperty="categoryId" resultType="int" order="BEFORE">
+            SELECT id FROM t_category WHERE category_name = #{categoryName}
+        </selectKey>
+        INSERT INTO t_item_category(category_id, item_id) VALUES (#{categoryId}, #{itemId})
+    </insert>
 </mapper>
 

@@ -40,10 +40,11 @@ public class UserServiceImpl implements UserService {
         String filename = user.getAvatar().substring(user.getAvatar().lastIndexOf('/') + 1);
         System.out.println(filename);
         Integer id = userMapper.register(user);
+        System.out.println("user"+id+"==="+user.getId());
         if(user.getAvatar()==null){
             return true;
         }else{
-            fileMapper.addUserFile(filename, user.getAvatar(), id);
+            fileMapper.addUserFile(filename, user.getAvatar(), user.getId());
         }
         return true;
     }

@@ -37,7 +37,8 @@
                email,
                phone_number AS phone,
                sex,
-               biography
+               biography,
+               is_admin
         from sys_user
         where username = #{name}
     </select>

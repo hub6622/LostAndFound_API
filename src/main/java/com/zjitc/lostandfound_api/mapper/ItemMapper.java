@@ -29,7 +29,7 @@ public interface ItemMapper { // 修改了mapper的名字
     @Insert("insert into t_item_comment_reply(item,comment,reply) values (#{itemId},#{commentId},#{replyId})") // 修改了表名和字段名
     void addItemCommentReply(Integer itemId, Integer commentId, Integer replyId); // 修改了方法名和参数名
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    Integer addItem(Item item); // 修改了方法名和参数类型
+    Integer addItem(Item item);
 
     @Update("update t_item set comment_counts = comment_counts + 1 where id = #{itemId}") // 修改了表名和字段名
     void updateItemCommentCounts(Integer itemId); // 修改了方法名
@@ -63,8 +63,8 @@ public interface ItemMapper { // 修改了mapper的名字
 
     List<ItemComment> getAllComments();
     List<String> getCategoriesByItemId(Integer id);
-    @Insert("insert into t_item_category(category_id,item_id) values(#{categoryId},#{itemId})")
-    void updateItemCategory(Integer categoryId, Integer itemId);
+
+    void updateItemCategory(String categoryName, Integer itemId);
 
     @Insert("insert into t_category(category_name,create_time) values(#{categoryName},CURRENT_TIMESTAMP)")
     boolean addCategory(String categoryName);
@@ -74,4 +74,7 @@ public interface ItemMapper { // 修改了mapper的名字
 
     @Delete("delete from t_category where id = #{id}")
     void delCategory(Integer id);
+
+    @Delete("delete from t_item_category where item_id = #{id}")
+    void delItemCategory(Integer id);
 }

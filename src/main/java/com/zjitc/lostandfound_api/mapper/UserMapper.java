@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Insert("insert into sys_user(create_time,username,password,avatar,sex) values (CURRENT_TIMESTAMP,#{name},#{password},#{avatar},#{sex})")
+    @Insert("insert into sys_user(create_time,username,password,avatar,sex,status) values (CURRENT_TIMESTAMP,#{name},#{password},#{avatar},#{sex},1)")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     Integer register(User user);
 

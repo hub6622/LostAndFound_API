@@ -14,17 +14,19 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(loginInterceptor)
-//                .excludePathPatterns(
-//                        "/user/login/**",
-//                        "/user/register",
-//                        "/item/list",
-//                        "/item/getItemById/**",
-//                        "/item/getItemByCategory/**",
-//                        "/item/commentsByItemId/**",
-//                        "/item/getCategory",
-//                        "/item/hotItem",
-//                        "/item/updateItemViewCounts/**"
-//                );
+        registry.addInterceptor(loginInterceptor)
+                .excludePathPatterns(
+                        "/user/login/**",
+                        "/user/register",
+                        "/item/list",
+                        "/item/getItemById/**",
+                        "/item/getItemByCategory/**",
+                        "/item/commentsByItemId/**",
+                        "/item/getCategory",
+                        "/item/hotItem",
+                        "/item/updateItemViewCounts/**",
+                        "/admin/login",
+                        "/upload"
+                );
     }
 }

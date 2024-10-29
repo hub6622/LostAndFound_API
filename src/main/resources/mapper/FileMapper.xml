@@ -6,7 +6,7 @@
     <resultMap id="user" type="User">
         <id column="u_id" property="id"/>
         <result property="name" column="user_username"/>
-        <result property="avatar" column="avatar"/>
+        <result property="avatar" column="author_avatar"/>
     </resultMap>
 
     <resultMap id="fileUser" type="File">
@@ -16,6 +16,8 @@
         <result property="createTime" column="create_time"/>
         <result property="fileUrl" column="file_url"/>
         <result property="updateTime" column="update_time"/>
+        <result property="isAvatar" column="isAvatar"/>
+        <result property="itemId" column="itemId"/>
         <association property="user" javaType="User" resultMap="user"/>
     </resultMap>
 
@@ -28,7 +30,9 @@
                f.user_id,
                u.username AS user_username,
                u.avatar   AS author_avatar,
-               u.user_id  AS u_id
+               u.user_id  AS u_id,
+               f.is_avatar as isAvatar,
+               f.item_id as itemId
         FROM sys_file f
                  LEFT JOIN
              sys_user u ON f.user_id = u.user_id

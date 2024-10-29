@@ -15,4 +15,6 @@ public class File {
     private String createTime;
     private String updateTime;
     private String fileUrl;
+    private Integer isAvatar;
+    private Integer itemId;
 }

@@ -7,7 +7,9 @@ import com.zjitc.lostandfound_api.pojo.*;
 import com.zjitc.lostandfound_api.service.ItemService;
 import com.zjitc.lostandfound_api.service.UserService;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> findAll() {
         List<Item> itemList = itemMapper.findAll();
-        for (Item item:itemList
-             ) {
+        for (Item item : itemList
+        ) {
             item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
         }
         return itemList;
@@ -36,7 +38,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> findNewest() {
         List<Item> itemList = itemMapper.findNewest();
-        for (Item item:itemList
+        for (Item item : itemList
         ) {
             item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
         }
@@ -46,7 +48,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> findByCategory(String category) {
         List<Item> itemList = itemMapper.getItemByCategory(category);
-        for (Item item:itemList
+        for (Item item : itemList
         ) {
             item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
         }
@@ -55,7 +57,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item getById(Integer id) {
-        return itemMapper.getItemById(id);
+        Item item = itemMapper.getItemById(id);
+        item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
+        return item;
     }
 
 
@@ -94,7 +98,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void addItem(String name, Map<String, Object> item) {
         Item item1 = new Item();
-        String url= (String) item.get("picUrl");
+        String url = (String) item.get("picUrl");
         item1.setTitle((String) item.get("title"));
         item1.setContent((String) item.get("content"));
         item1.setPicUrl(url);
@@ -103,8 +107,18 @@ public class ItemServiceImpl implements ItemService {
         User user = userMapper.getUser(name);
         item1.setAuthor(user);
         String filename = url.substring(url.lastIndexOf('/') + 1);
-        itemMapper.addItem(item1);
-        fileMapper.addUserFile( filename, item1.getPicUrl(), user.getId());
+        Integer id = itemMapper.addItem(item1);
+        fileMapper.addItemFile(item1.getId(),filename, item1.getPicUrl(), user.getId());
+//        void addFile(Integer item_id, String filename, String picUrl,Integer user_id);
+        List<String> categoriesId = (List<String>) item.get("categories");
+
+        try {
+            for (String categoryId : categoriesId) {
+                itemMapper.updateItemCategory(categoryId, item1.getId());
+            }
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -128,8 +142,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> findByUser(Integer userId) { // 修改了返回类型
-        return itemMapper.findByUserName(userId); // 保持不变
+    public List<Item> findByUser(Integer userId) {
+        List<Item> itemList = itemMapper.findByUserName(userId);
+        for (Item item : itemList
+        ) {
+            item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
+        }
+        return itemList;
     }
 
     @Override
@@ -147,20 +166,26 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void updateItem(Map<String, Object> item) {
         Item item1 = new Item();
-        String url= (String) item.get("picUrl");
+        String url = (String) item.get("picUrl");
         item1.setId(Integer.parseInt(item.get("id").toString()));
         item1.setTitle((String) item.get("title"));
         item1.setContent((String) item.get("content"));
         item1.setPicUrl((String) item.get("picUrl"));
-        List<Integer> categoriesId = (List<Integer>) item.get("categories");
-
         item1.setLostOrFound(Integer.parseInt(item.get("lostOrFound").toString()));
         String filename = url.substring(url.lastIndexOf('/') + 1);
         fileMapper.updateItemFile(item1.getId(), filename, item1.getPicUrl());
         itemMapper.updateItem(item1);
-        for (Integer categoryId:categoriesId
-             ) {
-            itemMapper.updateItemCategory(categoryId,item1.getId());
+
+        List<String> categoriesId = (List<String>) item.get("categories");
+
+
+        try {
+            itemMapper.delItemCategory(item1.getId());
+            for (String categoryId : categoriesId) {
+                itemMapper.updateItemCategory(categoryId, item1.getId());
+            }
+        } catch (ClassCastException e) {
+            e.printStackTrace();
         }
 
     }
@@ -168,7 +193,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> findByParams(String category, String title) {
         List<Item> itemList = itemMapper.findByParams(category, title);
-        for (Item item:itemList
+        for (Item item : itemList
         ) {
             item.setCategories(itemMapper.getCategoriesByItemId(item.getId()));
         }
@@ -178,24 +203,24 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public boolean addCategory(Map<String, Object> params) {
         String categoryName = (String) params.get("categoryName");
-        System.out.println("categoryName"+categoryName);
+        System.out.println("categoryName" + categoryName);
         return itemMapper.addCategory(categoryName);
     }
 
     @Override
     public Boolean updateCategory(Map<String, Object> params) {
         String categoryName = (String) params.get("categoryName");
-        System.out.println("categoryName"+categoryName);
+        System.out.println("categoryName" + categoryName);
         Integer id = Integer.parseInt(params.get("id").toString());
-        System.out.println("updateCategory"+id+"===="+categoryName);
+        System.out.println("updateCategory" + id + "====" + categoryName);
         return itemMapper.updateCategory(categoryName, id);
     }
 
     @Override
     public boolean deleteCategory(List<Integer> ids) {
-        System.out.println("deleteCategory"+ids);
-        for (Integer id:ids
-             ) {
+        System.out.println("deleteCategory" + ids);
+        for (Integer id : ids
+        ) {
             itemMapper.delCategory(id);
         }
         return true;

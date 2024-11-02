@@ -138,4 +138,12 @@ public class AdminController {
     public Result getCategory(){
         return new Result(200,"获取成功", adminService.findCategory());
     }
+
+    @PostMapping("/addNotice")
+    public Result addNotice(@RequestHeader(name="Authorization") String token,@RequestBody Map<String, Object> params){
+        System.out.println("addNotice+++++"+params.get("noticeContent"));
+        String noticeContent = (String) params.get("noticeContent");
+        adminService.addNotice(noticeContent,token);
+        return new Result(200,"添加成功", true);
+    }
 }

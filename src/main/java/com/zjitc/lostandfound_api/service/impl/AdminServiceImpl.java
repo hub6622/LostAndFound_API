@@ -154,5 +154,11 @@ public class AdminServiceImpl implements AdminService {
         return adminMapper.findAllCategory();
     }
 
+    @Override
+    public void addNotice(String noticeContent, String token) {
+        Integer userId = userService.getUserId(token);
+        adminMapper.addNotice(noticeContent,userId);
+    }
+
 
 }

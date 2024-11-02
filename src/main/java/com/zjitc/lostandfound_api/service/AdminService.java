@@ -38,4 +38,6 @@ public interface AdminService {
     boolean deleteNotice(List<Integer> ids);
 
     List<Category> findCategory();
+
+    void addNotice(String noticeContent, String token);
 }

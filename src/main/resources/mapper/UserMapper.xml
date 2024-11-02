@@ -25,6 +25,7 @@
         <result property="itemId" column="item_id"/>
         <result property="updateTime" column="updateTime"/>
         <result property="confirm" column="confirm"/>
+        <result property="recipientId" column="recipientId"/>
         <association property="author" javaType="User" resultMap="Author"/>
         <association property="recipient" javaType="User" resultMap="Recipient"/>
     </resultMap>
@@ -57,7 +58,7 @@
                u.avatar   as author_avatar,
                u.sex      as author_sex,
                n.confirm,
-               n.recipient_id,
+               n.recipient_id as recipientId,
                r.user_id  as recipient_id,
                r.username as recipient_username,
                r.avatar   as recipient_avatar,
@@ -65,11 +66,12 @@
         from sys_notice n
                  inner join
              sys_user u on n.author_id = u.user_id
-                 inner join
+                 left join
              sys_user r on n.recipient_id = r.user_id
-        where n.recipient_id = #{userId}
+        where (n.recipient_id = #{userId} or n.recipient_id = 0)
           and n.confirm = 0
     </select>
+
 
 
     <select id="getNoticeHistory" resultMap="noticeUser">
@@ -85,7 +87,7 @@
                u.avatar   as author_avatar,
                u.sex      as author_sex,
                n.confirm,
-               n.recipient_id,
+               n.recipient_id as recipientId,
                r.user_id  as recipient_id,
                r.username as recipient_username,
                r.avatar   as recipient_avatar,
@@ -93,11 +95,12 @@
         from sys_notice n
                  inner join
              sys_user u on n.author_id = u.user_id
-                 inner join
+                 left join
              sys_user r on n.recipient_id = r.user_id
-        where n.recipient_id = #{userId}
+        where (n.recipient_id = #{userId} or n.recipient_id = 0)
         ORDER BY n.confirm
     </select>
+
 
     <select id="getAllNotice" resultMap="noticeUser">
         select n.id,
@@ -112,7 +115,7 @@
                u.avatar   as author_avatar,
                u.sex      as author_sex,
                n.confirm,
-               n.recipient_id,
+               n.recipient_id as recipientId,
                r.user_id  as recipient_id,
                r.username as recipient_username,
                r.avatar   as recipient_avatar,
@@ -120,8 +123,9 @@
         from sys_notice n
                  inner join
              sys_user u on n.author_id = u.user_id
-                 inner join
+                 left join
              sys_user r on n.recipient_id = r.user_id
     </select>
+
 
 </mapper>

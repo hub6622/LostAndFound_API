@@ -9,14 +9,14 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
-public interface ItemMapper { // 修改了mapper的名字
+public interface ItemMapper {
 
-    List<Item> findAll(); // 修改了返回类型
+    List<Item> findAll();
     List<Item> findNewest();
 
-    List<Item> getItemByCategory(String category); // 修改了方法名
+    List<Item> getItemByCategory(String category);
 
-    Item getItemById(Integer id); // 修改了方法名和返回类型
+    Item getItemById(Integer id);
 
     List<ItemComment> getComments(Integer id); // 修改了返回类型
 

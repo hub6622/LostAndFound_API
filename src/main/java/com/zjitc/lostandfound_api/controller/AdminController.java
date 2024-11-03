@@ -5,7 +5,6 @@ import com.zjitc.lostandfound_api.pojo.User;
 import com.zjitc.lostandfound_api.service.AdminService;
 import com.zjitc.lostandfound_api.service.UserService;
 import com.zjitc.lostandfound_api.utils.JwtToken;
-import io.lettuce.core.ScriptOutputType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;

@@ -6,9 +6,9 @@ import com.zjitc.lostandfound_api.pojo.ItemComment; // 修改了pojo的名字
 import java.util.List;
 import java.util.Map;
 
-public interface ItemService { // 修改了service的名字
+public interface ItemService {
 
-    List<Item> findAll(); // 修改了返回类型
+    List<Item> findAll();
     List<Item> findNewest();
 
     List<Item> findByCategory(String category); // 修改了返回类型
@@ -21,11 +21,11 @@ public interface ItemService { // 修改了service的名字
 
     void addCommentReply(String name, String content, Integer commentId, Integer itemId); // 修改了方法名
 
-    void addItem(String name, Map<String, Object> item); // 修改了方法名和参数名
+    void addItem(String name, Map<String, Object> item);
 
     void updateItemCommentCounts(Integer itemId); // 修改了方法名和参数名
 
-    List<String> findCategory(); // 保持不变
+    List<String> findCategory();
 
     void updateItemViewCounts(Integer itemId); // 修改了方法名和参数名
 

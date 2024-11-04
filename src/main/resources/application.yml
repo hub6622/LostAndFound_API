@@ -35,7 +35,7 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
 
 minio:
-  endPoint: http://www.ppg6.store:9000
+  endPoint: http://120.26.93.27:9000
   accessKey: PPG
   secretKey: 123@XyjPPG
   bucketName: public

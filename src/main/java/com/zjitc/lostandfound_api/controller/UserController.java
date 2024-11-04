@@ -109,9 +109,9 @@ public class UserController {
     public Result getNoticeHistory(@RequestHeader(name="Authorization") String token) {
         return new Result(200,"获取成功",userService.getNoticeHistory(token));
     }
-    @PostMapping("/confirmNotice/{id}")
-    public Result confirmNotice(@PathVariable Integer id) {
-        userService.confirmNotice(id);
+    @PostMapping("/confirmNotice")
+    public Result confirmNotice(@RequestBody Map<String, Object> notice) {
+        userService.confirmNotice(notice);
         return new Result(200,"确认成功",null);
     }
 }

@@ -51,7 +51,9 @@ public interface UserMapper {
     @Insert("insert into sys_notice(content,tradeTime,contact,author_id,item_id,updateTime,recipient_id,confirm)" +
             " values( #{content},#{tradeTime},#{contact},#{authorId},#{itemId},CURRENT_TIMESTAMP,#{recipientId},0)")
     void sendContact(Notice notice);
-
+    @Insert("insert into sys_notice(content,author_id,item_id,updateTime,recipient_id,confirm)" +
+            " values('同意了你的请求',#{authorId},#{itemId},CURRENT_TIMESTAMP,#{recipientId},#{confirm})")
+    void sendGGContact(Integer authorId,Integer itemId,Integer recipientId,Integer confirm);
     @Update("update t_item set comment_counts = comment_counts - #{count} where id = #{id}")
     void subtractCommentCounts(Integer count, Integer id);
 
@@ -59,8 +61,8 @@ public interface UserMapper {
 
     List<Notice> getNoticeHistory(Integer userId);
 
-    @Update("update sys_notice set confirm=1 where id=#{id}")
-    void updateNoticeConfirm(Integer id);
+    @Update("update sys_notice set confirm=#{confirm} where id=#{id}")
+    void updateNoticeConfirm(Integer confirm,Integer id);
 
     @Update("update sys_user set sex=#{sex},email=#{email},biography=#{biography},phone_number=#{phone} where user_id=#{id}")
     void updateUserInfo(User user);

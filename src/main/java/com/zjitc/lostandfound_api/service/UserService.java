@@ -35,7 +35,7 @@ public interface UserService {
 
     List<Notice> getNotice(String token);
 
-    void confirmNotice(Integer id);
+    void confirmNotice(Map<String, Object> notice);
 
     List<Notice> getNoticeHistory(String token);
 
@@ -44,4 +44,5 @@ public interface UserService {
     Boolean resetPwd(Integer id);
 
     void setLoginTime(String name);
+
 }

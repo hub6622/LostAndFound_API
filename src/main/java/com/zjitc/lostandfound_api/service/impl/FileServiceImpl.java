@@ -29,7 +29,8 @@ public class FileServiceImpl implements FileService {
         System.out.println(filename);
         String cotentType = file.getContentType();
         minioUtils.uploadFile(minioConfig.getBucketName(),file,filename,cotentType);
-        String url = "http://www.ppg6.store:9000/public/"+filename;
+        String url = minioConfig.getEndpoint()+"/"+minioConfig.getBucketName()+"/"+filename;
+        System.out.println(url);
         return url;
     }
 

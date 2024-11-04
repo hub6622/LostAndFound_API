@@ -36,14 +36,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean register(User user) {
         user.setPassword(encodeUtil.Md5Encode(user.getPassword()));
-        if(user.getAvatar()==null) user.setAvatar("http://www.ppg6.store:9000/public/d5f11b41-4b24-49ae-9268-283a580b7767.png");
+        if (user.getAvatar() == null)
+            user.setAvatar("http://www.ppg6.store:9000/public/d5f11b41-4b24-49ae-9268-283a580b7767.png");
         String filename = user.getAvatar().substring(user.getAvatar().lastIndexOf('/') + 1);
         System.out.println(filename);
         Integer id = userMapper.register(user);
-        System.out.println("user"+id+"==="+user.getId());
-        if(user.getAvatar()==null){
+        System.out.println("user" + id + "===" + user.getId());
+        if (user.getAvatar() == null) {
             return true;
-        }else{
+        } else {
             fileMapper.addUserFile(filename, user.getAvatar(), user.getId());
         }
         return true;
@@ -53,13 +54,13 @@ public class UserServiceImpl implements UserService {
     public Integer login(User user) {
         String Pwd = userMapper.getPwd(user.getName());
         try {
-            if (encodeUtil.checkPassword(Pwd, user.getPassword())){
-                if(userMapper.status(user.getName()) == 1){
+            if (encodeUtil.checkPassword(Pwd, user.getPassword())) {
+                if (userMapper.status(user.getName()) == 1) {
                     return 1;
-                }else {
+                } else {
                     return 2;
                 }
-            }else {
+            } else {
                 return 3;
             }
         } catch (Exception e) {
@@ -174,8 +175,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void confirmNotice(Integer id) {
-        userMapper.updateNoticeConfirm(id);
+    public void confirmNotice(Map<String, Object> notice) {
+        Integer confirm = (Integer) notice.get("confirm");
+        Integer id = (Integer) notice.get("id");
+        if (confirm==2){
+            System.out.println("confirm");
+            userMapper.updateNoticeConfirm(1,id);
+        }else {
+            System.out.println("send");
+            confirm = 2;
+//            Integer authorId,Integer itemId,Integer recipientId,Integer confirm
+            userMapper.updateNoticeConfirm(1,id);
+            userMapper.sendGGContact((Integer) notice.get("recipientId"),(Integer) notice.get("itemId"),(Integer) notice.get("authorId"),confirm);
+        }
+
     }
 
     @Override

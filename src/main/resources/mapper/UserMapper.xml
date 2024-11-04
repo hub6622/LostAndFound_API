@@ -69,7 +69,7 @@
                  left join
              sys_user r on n.recipient_id = r.user_id
         where (n.recipient_id = #{userId} or n.recipient_id = 0)
-          and n.confirm = 0
+          and n.confirm != 1
     </select>
 
 

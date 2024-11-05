@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/item/getItemById/**",
                         "/item/getItemByCategory/**",
                         "/item/commentsByItemId/**",
-                        "/item/getCategory",
+                        "/admin/getCategory",
                         "/item/hotItem",
                         "/item/updateItemViewCounts/**",
                         "/admin/login",

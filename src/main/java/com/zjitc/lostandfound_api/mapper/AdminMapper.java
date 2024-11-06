@@ -65,6 +65,9 @@ public interface AdminMapper {
     @Select("select * from t_category")
     List<Category> findAllCategory();
 
-    @Insert("insert into sys_notice(content,author_id,confirm,updateTime,recipient_id) values(#{noticeContent},#{userId},0,CURRENT_TIMESTAMP,0)")
-    void addNotice(String noticeContent, Integer userId);
+    @Insert("insert into sys_notice(content,author_id,confirm,updateTime,recipient_id) values(#{noticeContent},#{userId},0,CURRENT_TIMESTAMP,#{recipientId})")
+    void addNotice(String noticeContent, Integer userId,Integer recipientId);
+
+    @Select("select user_id from sys_user")
+    List<Integer> getAllUserId();
 }

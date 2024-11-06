@@ -18,5 +18,6 @@ public class Notice {
     private Integer confirm;
     private String updateTime;
     private Integer recipientId;
+    private Integer system;
     private User recipient;
 }

@@ -175,7 +175,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void addNotice(String noticeContent, String token) {
         Integer userId = userService.getUserId(token);
-        adminMapper.addNotice(noticeContent,userId);
+        List<Integer> ids = adminMapper.getAllUserId();
+        for (Integer recipientId:ids
+             ) {
+            adminMapper.addNotice(noticeContent,userId,recipientId);
+        }
     }
 
 

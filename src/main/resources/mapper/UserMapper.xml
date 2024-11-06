@@ -26,6 +26,7 @@
         <result property="updateTime" column="updateTime"/>
         <result property="confirm" column="confirm"/>
         <result property="recipientId" column="recipientId"/>
+        <result property="system" column="system"/>
         <association property="author" javaType="User" resultMap="Author"/>
         <association property="recipient" javaType="User" resultMap="Recipient"/>
     </resultMap>
@@ -53,6 +54,7 @@
                n.tradeTime,
                n.contact,
                n.author_id,
+               n.system,
                u.user_id  as author_id,
                u.username as author_username,
                u.avatar   as author_avatar,
@@ -82,6 +84,7 @@
                n.tradeTime,
                n.contact,
                n.author_id,
+               n.system,
                u.user_id  as author_id,
                u.username as author_username,
                u.avatar   as author_avatar,
@@ -110,6 +113,7 @@
                n.tradeTime,
                n.contact,
                n.author_id,
+               n.system,
                u.user_id  as author_id,
                u.username as author_username,
                u.avatar   as author_avatar,

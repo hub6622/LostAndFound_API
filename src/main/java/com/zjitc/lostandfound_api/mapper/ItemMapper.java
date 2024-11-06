@@ -77,4 +77,7 @@ public interface ItemMapper {
 
     @Delete("delete from t_item_category where item_id = #{id}")
     void delItemCategory(Integer id);
+
+    @Select("select id from t_item where author_id = #{id}")
+    List<Integer> getItemIdByUser(Integer id);
 }

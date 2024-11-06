@@ -1,10 +1,12 @@
 package com.zjitc.lostandfound_api.service.impl;
 
 import com.zjitc.lostandfound_api.mapper.AdminMapper;
+import com.zjitc.lostandfound_api.mapper.FileMapper;
 import com.zjitc.lostandfound_api.mapper.ItemMapper;
 import com.zjitc.lostandfound_api.mapper.UserMapper;
 import com.zjitc.lostandfound_api.pojo.*;
 import com.zjitc.lostandfound_api.service.AdminService;
+import com.zjitc.lostandfound_api.service.ItemService;
 import com.zjitc.lostandfound_api.service.UserService;
 import com.zjitc.lostandfound_api.utils.EncodeUtil;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,10 @@ public class AdminServiceImpl implements AdminService {
     @Resource
     private ItemMapper itemMapper;
     @Resource
+    private ItemService itemService;
+    @Resource
+    private FileMapper fileMapper;
+    @Resource
     UserMapper userMapper;
     @Resource
     UserService userService;
@@ -35,6 +41,8 @@ public class AdminServiceImpl implements AdminService {
             for (Integer id : ids) {
                 // 单个删除逻辑
                 adminMapper.deleteUser(id);
+                fileMapper.delFileByUserId(id);;
+                itemService.delItem(itemMapper.getItemIdByUser(id));
             }
             return true;
         } catch (Exception e) {
@@ -52,7 +60,17 @@ public class AdminServiceImpl implements AdminService {
     public Boolean newUser(User user) {
         EncodeUtil encodeUtil = new EncodeUtil();
         user.setPassword(encodeUtil.Md5Encode("12345678"));
+        String filename = null;
+        if (user.getAvatar() != null){
+            filename = user.getAvatar().substring(user.getAvatar().lastIndexOf('/') + 1);
+        }
+        System.out.println(filename);
         adminMapper.newUser(user);
+        if (user.getAvatar() == null) {
+            return true;
+        } else {
+            fileMapper.addUserFile(filename, user.getAvatar(), user.getId());
+        }
         return true;
     }
 

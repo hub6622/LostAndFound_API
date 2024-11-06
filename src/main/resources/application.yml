@@ -39,3 +39,6 @@ minio:
   accessKey: PPG
   secretKey: 123@XyjPPG
   bucketName: public
+
+
+

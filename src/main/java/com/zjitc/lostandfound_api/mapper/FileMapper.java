@@ -28,4 +28,6 @@ public interface FileMapper {
 
     @Delete("delete from sys_file where file_name=#{name}")
     void delFile(String name);
+    @Delete("delete from sys_file where user_id=#{id}")
+    void delFileByUserId(Integer id);
 }

@@ -35,6 +35,7 @@ public interface AdminMapper {
 
     @Insert("insert into sys_user(username,email,phone_number,sex,avatar,is_admin,create_time,status) " +
             "values(#{name},#{email},#{phone},#{sex},#{avatar},#{isAdmin},CURRENT_TIMESTAMP,#{status})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     void newUser(User user);
 
     @Update("update sys_user set status=#{status} where user_id=#{id}")

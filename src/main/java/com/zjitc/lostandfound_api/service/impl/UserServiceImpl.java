@@ -36,8 +36,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean register(User user) {
         user.setPassword(encodeUtil.Md5Encode(user.getPassword()));
-        if (user.getAvatar() == null)
-            user.setAvatar("http://www.ppg6.store:9000/public/d5f11b41-4b24-49ae-9268-283a580b7767.png");
         String filename = user.getAvatar().substring(user.getAvatar().lastIndexOf('/') + 1);
         System.out.println(filename);
         Integer id = userMapper.register(user);

@@ -131,10 +131,14 @@ public class UserServiceImpl implements UserService {
     public void updateUserInfo(Map<String, Object> userInfo, String token) {
         User user = new User();
         user.setId(getUserId(token));
-        user.setEmail(userInfo.get("email").toString());
-        user.setSex(Integer.valueOf(userInfo.get("sex").toString()));
-        user.setBiography(userInfo.get("biography").toString());
-        user.setPhone(userInfo.get("phone").toString());
+        try{
+            user.setEmail(userInfo.get("email").toString());
+            user.setSex(Integer.valueOf(userInfo.get("sex").toString()));
+            user.setBiography(userInfo.get("biography").toString());
+            user.setPhone(userInfo.get("phone").toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         userMapper.updateUserInfo(user);
     }
 

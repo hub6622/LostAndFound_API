@@ -26,7 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/item/hotItem",
                         "/item/updateItemViewCounts/**",
                         "/admin/login",
-                        "/upload"
+                        "/upload",
+                        "/item/getItemByParams"
                 );
     }
 }
